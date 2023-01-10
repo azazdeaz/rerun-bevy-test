@@ -1,0 +1,26 @@
+[package]
+name = "rerun-bevy-test"
+version = "0.1.0"
+edition = "2021"
+publish = false
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+bevy = { version = "0.9.1" }
+rerun_sdk = { path = "../rerun/crates/rerun_sdk", default-features = false }
+re_memory = { path = "../rerun/crates/re_memory" }
+re_log_types = { path = "../rerun/crates/re_log_types" }
+# rerun = { path = "../rerun/crates/rerun" }
+image = { version = "0.24", default-features = false }
+wgpu = "0.14"
+pollster = "0.2.5"
+futures-intrusive = "0.4.0"
+clap = "4.0.32"
+
+[[bin]]
+name = "main"
+path = "src/main.rs"
+
+[[bin]]
+name = "rerun"
+path = "src/rerun.rs"
