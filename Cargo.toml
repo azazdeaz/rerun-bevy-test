@@ -6,10 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]
 name = "rerun_bevy_test"
-crate-type = ["cdylib", "rlib"]
+crate-type = ["cdylib"]
 
 [dependencies]
 pyo3 = { version = "0.17.3", features = ["extension-module"] }
+pyo3-asyncio = { version = "0.17.0", features = ["attributes", "async-std-runtime"] }
 bevy = { version = "0.9.1" }
 # rerun_sdk = { path = "../rerun/crates/rerun_sdk", default-features = false }
 # re_memory = { path = "../rerun/crates/re_memory" }
@@ -20,3 +21,8 @@ wgpu = "0.14"
 pollster = "0.2.5"
 futures-intrusive = "0.4.0"
 clap = "4.0.32"
+numpy = "0.17.2"
+nalgebra-numpy = "0.3.0"
+nalgebra = "0.31.4"
+async-std = "1.12.0"
+crossbeam-channel = "0.5.6"
