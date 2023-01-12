@@ -14,6 +14,13 @@ use pollster::FutureExt;
 
 use std::sync::atomic::{AtomicBool, Ordering};
 
+#[derive(Clone)]
+pub struct ImageDataEvent {
+    pub data: Vec<u8>,
+    pub width: u32,
+    pub height: u32,
+}
+
 pub fn receive_images(
     image_copiers: Query<&ImageCopier>,
     mut images: ResMut<Assets<Image>>,

@@ -11,7 +11,7 @@ use wgpu::{Extent3d, TextureDescriptor, TextureDimension, TextureFormat, Texture
 
 use image::io::Reader;
 
-use crate::image_copy::{ImageCopier, ImageCopyPlugin};
+use crate::image_copy::{ImageCopier, ImageCopyPlugin, ImageDataEvent};
 
 #[derive(Component, Default)]
 pub struct CaptureCamera;
@@ -154,6 +154,7 @@ fn update(
     mut images: ResMut<Assets<Image>>,
     mut scene_controller: ResMut<SceneController>,
     mut app_exit_writer: EventWriter<AppExit>,
+    mut ev_image: EventWriter<ImageDataEvent>,
 ) {
     if let SceneState::Render(n) = scene_controller.state {
         if n > 0 {
@@ -161,41 +162,11 @@ fn update(
         } else {
             for image in images_to_save.iter() {
                 let data = &images.get_mut(image).unwrap().data;
-
-                let images_path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("test_images");
-                println!("OUTPUT PATH = {:?}", images_path);
-                let image_path = images_path.join(format!("{}.png", scene_controller.name));
-
-                // Create test image file
-                if scene_controller.create_images {
-                    image::save_buffer(
-                        image_path,
-                        data,
-                        scene_controller.width,
-                        scene_controller.height,
-                        image::ColorType::Rgba8,
-                    )
-                    .unwrap();
-                } else {
-                    // Test against existing image
-                    match Reader::open(&image_path) {
-                        Ok(file) => {
-                            let existing_image = file.decode().unwrap();
-                            if data != existing_image.as_flat_samples_u8().unwrap().samples {
-                                panic!(
-                                    "{} failed, {:?} does not match",
-                                    scene_controller.name, image_path
-                                )
-                            }
-                        }
-                        Err(_) => {
-                            panic!(
-                                "{} failed, could not find file {:?}",
-                                scene_controller.name, image_path
-                            )
-                        }
-                    }
-                }
+                ev_image.send(ImageDataEvent {
+                    data: data.to_vec(),
+                    width: scene_controller.width,
+                    height: scene_controller.height,
+                });
             }
             app_exit_writer.send(AppExit);
         }

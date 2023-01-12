@@ -2,17 +2,22 @@ import rerun_bevy_test
 import rerun
 import asyncio
 import numpy as np
-from pynput import keyboard
-import threading
+import time
 
 
 async def main():
     st = rerun_bevy_test.SimTest()
-    for _ in range(10):
-        st.run()
-        print("rerun_bevy_test", await rerun_bevy_test.get_image())
-        rgb_image = np.random.randint(0, 255, (100, 200, 3)).astype(np.uint8)
-        rerun.log_image("world/camera/image/rgb", rgb_image)
+    st.run()
+    images_sent = 0
+    for _ in range(20):
+        st.step()
+        images= st.get_images()
+        for image in images:
+            (data, width, height) = image
+            image = np.array(data).reshape((width, height, 4)).astype(np.uint8)
+            rerun.log_image("world/camera/image/rgb", image)
+            images_sent += 1
+            print(f"Send image to rerun #{images_sent}")
             
     
 if __name__ == "__main__":

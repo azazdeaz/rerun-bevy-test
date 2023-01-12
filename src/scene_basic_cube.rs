@@ -5,8 +5,14 @@ use crate::scene_tester::{setup_test, SceneController};
 pub struct ScenePlugin;
 impl Plugin for ScenePlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(scene);
+        app.add_startup_system(scene).add_system(rotate_cube);
     }
+}
+use std::f32::consts::TAU;
+
+#[derive(Component)]
+struct Rotatable {
+    speed: f32,
 }
 
 fn scene(
@@ -24,12 +30,15 @@ fn scene(
         ..default()
     });
     // cube
-    commands.spawn(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-        material: materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
-        transform: Transform::from_xyz(0.0, 0.5, 0.0),
-        ..default()
-    });
+    commands.spawn((
+        PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+            material: materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
+            transform: Transform::from_xyz(0.0, 0.5, 0.0),
+            ..default()
+        },
+        Rotatable { speed: 0.1 },
+    ));
     // light
     commands.spawn(PointLightBundle {
         point_light: PointLight {
@@ -46,7 +55,7 @@ fn scene(
         &mut images,
         &render_device,
         &mut scene_controller,
-        15,
+        0,
         String::from("basic_cube_scene"),
     );
 
@@ -59,4 +68,13 @@ fn scene(
         },
         ..default()
     });
+}
+
+fn rotate_cube(mut cubes: Query<(&mut Transform, &Rotatable)>, timer: Res<Time>) {
+    for (mut transform, cube) in &mut cubes {
+        // The speed is first multiplied by TAU which is a full rotation (360deg) in radians,
+        // and then multiplied by delta_seconds which is the time that passed last frame.
+        // In other words. Speed is equal to the amount of rotations per second.
+        transform.rotate_y(cube.speed * TAU * timer.delta_seconds());
+    }
 }
