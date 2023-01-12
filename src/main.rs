@@ -10,6 +10,7 @@ fn main() {
         stdin().read_line(&mut buf).unwrap();
         tx.send(buf).unwrap();
     });
+
     App::new()
         .add_event::<StdinLine>()
         .add_plugins(DefaultPlugins)
@@ -22,10 +23,7 @@ fn main() {
 #[derive(Resource)]
 struct StdinReceiver(Receiver<String>);
 struct StdinLine(String);
-fn read_stdin_system(
-    mut receiver: ResMut<StdinReceiver>,
-    mut stdin: EventWriter<StdinLine>,
-) {
+fn read_stdin_system(mut receiver: ResMut<StdinReceiver>, mut stdin: EventWriter<StdinLine>) {
     let rx = receiver;
     if let Ok(line) = rx.0.try_recv() {
         stdin.send(StdinLine(line));
