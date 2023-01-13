@@ -40,7 +40,7 @@ impl SimTest {
         Ok(())
     }
 
-    pub fn get_images   (&mut self) -> PyResult<Option<Vec<(Vec<u8>, u32, u32)>>> {
+    pub fn get_images(&mut self) -> PyResult<Option<Vec<(Vec<u8>, u32, u32)>>> {
         let events = self.app.world.resource_mut::<Events<ImageDataEvent>>();
         if events.is_empty() {
             return Ok(None);
@@ -59,7 +59,6 @@ impl SimTest {
     }
 }
 
-/// A Python module implemented in Rust.
 #[pymodule]
 fn rerun_bevy_test(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<SimTest>()?;
